@@ -1,5 +1,7 @@
 package org.udg.pds.todoandroid.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -11,6 +13,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -33,7 +37,33 @@ public class NavDrawerActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+                    /* VERSIÓ APARTAT 3 (Afegir una Action a SnackBar)
+                    .setAction("ACTION", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(NavDrawerActivity.this, "Hola!", Toast.LENGTH_LONG).show();
+                        }
+                    }).show(); */
+
+                    /* VERSIÓ APARTAT 4 (Crear una nova activitat)
+                    .setAction("ACTION", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent i = new Intent(NavDrawerActivity.this, TestActivity.class);
+                            startActivity(i);
+                        }
+                    }).show(); */
+
+                    // VERSIÓ APARTAT 6 (Comunicació de dades entre activitats)
+                    .setAction("ACTION", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent i = new Intent(NavDrawerActivity.this, TestActivity.class);
+                        // Per llençar una activitat i esperar un resultat hem de fer servir
+                        // startActivityForResult en lloc de startActivity:
+                        startActivityForResult(i, 1); // El codi 1 és el tipus d'operació que sol·licitem. És un codi que hem d'escollir nosaltres.
+                    }
+                    }).show();
             }
         });
 
@@ -44,6 +74,25 @@ public class NavDrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                String result=data.getStringExtra("result");
+                // Mentre no hàgim près el botó de l'activitat TestActivity i hàgim tornat, el TextView es mostrarà com Hello World!
+                // Si hem près el botó d'aquesta altra activitat i hem tornat, llavors, el TextView tindrà com a text el mateix que havia en el EditView
+                // del TestActivity en el moment de prémer el botó. Per tant, estem portant un text d'una activitat a una altra.
+                TextView tv = (TextView)findViewById(R.id.text_nd);
+                tv.setText(result);
+                //Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+            } /*else {
+                Toast.makeText(this, "No result!", Toast.LENGTH_LONG).show();
+            } */
+        }
     }
 
     @Override
